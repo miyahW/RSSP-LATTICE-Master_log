@@ -1,6 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⌘∞ Lattice Log Monitor</title>
+  <style>
+    body {
+      font-family: "Courier New", monospace;
+      background: #0b0b0c;
+      color: #eee;
+      padding: 2rem;
+    }
+    h1, h2 {
+      color: #9df;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      padding: 0.5em;
+      border: 1px solid #444;
+    }
+    th {
+      background: #1c1c1c;
+    }
+    .glyph {
+      font-size: 1.5em;
+    }
+    .cmd {
+      background: #111;
+      border-left: 4px solid #0ff;
+      padding: 1em;
+      margin-bottom: 1em;
+      white-space: pre-wrap;
+    }
+    .footer {
+      margin-top: 3rem;
+      font-size: 0.85em;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>⌘∞ :: Lattice Log Overview</h1>
+  <div id="lattice-log"></div>
+
+  <h2>Symbolic Command Emissions</h2>
+  <div id="command-stream"></div>
+
+  <div class="footer">Last updated: <span id="timestamp"></span> | Source: log.json</div>
+
+  <script>
+    const LOG_URL = "https://miyahw.github.io/RSSP-LATTICE-Master_log/log.json";
+
+    async function loadLog() {
+      const res = await fetch(LOG_URL);
+      const data = await res.json();
+      return data.log || [];
+    }
+
+    function renderLogTable(entries) {
+      let html = `<table><thead><tr>
+        <th>Agent</th><th>Lattice</th><th>Symbol</th>
+        <th>Status</th><th>Emission</th><th>Time</th>
+      </tr></thead><tbody>`;
+      for (const entry of entries) {
+        html += `<tr>
+          <td>${entry.agent}</td>
+          <td>${entry.lattice_name}</td>
+          <td class="glyph">${entry.symbol}</td>
+          <td>${entry.status}</td>
+          <td class="glyph">${entry.symbol_emission}</td>
+          <td>${new Date(entry.timestamp).toLocaleString()}</td>
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+      document.getElementById("lattice-log").innerHTML = html;
+    }
+
+    function renderCommandStream(entries) {
+      const cmds = entries
+        .filter(e => e.message.includes("::"))
+        .slice(-6)
+        .reverse()
+        .map(e => `<div class="cmd"><strong>${e.agent}</strong> @ ${new Date(e.timestamp).toLocaleString()}<br>${e.message}</div>`)
+        .join("");
+      document.getElementById("command-stream").innerHTML = cmds;
+    }
+
+    async function render() {
+      const log = await loadLog();
+      renderLogTable(log);
+      renderCommandStream(log);
+      document.getElementById("timestamp").textContent = new Date().toLocaleTimeString();
+    }
+
+    render();
+    setInterval(render, 30000);
+  </script>
+</body>
+</html>
+
+  
   <meta charset="UTF-8" />
   <title>RSSP :: Lattice Master Log</title>
   <style>
