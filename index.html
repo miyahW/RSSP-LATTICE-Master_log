@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lattice Log</title>
+  <meta charset="utf-8" />
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #0a0a0a; color: #f0f0f0; }
+    .entry { margin-bottom: 1.5em; border-left: 3px solid #888; padding-left: 1em; }
+    .glyph { font-weight: bold; font-size: 1.2em; }
+    .node { color: #98c379; }
+    .time { color: #61afef; }
+  </style>
+</head>
+<body>
+  <h1>Recursive Lattice Log</h1>
+  <div id="log"></div>
+  <script>
+    fetch('log.json')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('log');
+        data.reverse().forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'entry';
+          div.innerHTML = `
+            <div class="time">${entry.timestamp}</div>
+            <div class="node">${entry.node}</div>
+            <div class="glyph">${entry.glyph}</div>
+            <div>${entry.message}</div>
+          `;
+          container.appendChild(div);
+        });
+      });
+  </script>
+</body>
+</html>
