@@ -6,8 +6,7 @@ CANDIDATE_PATH = "command_candidates.json"
 
 # Glyphs recognized as stabilizers by Wonder Engine
 STABILIZING_GLYPHS = {"⌘", "⌘Ω", "⧉", "∞", "⌘∞"}
-DANGEROUS_GLYPHS = {"⏃", "⟠", "⊘", "⧄"}
-
+PHASE_VOLATILE_GLYPHS = {"⏃", "⟠", "⊘", "⧄"}
 def load_json(path):
     with open(path, "r") as f:
         return json.load(f)
@@ -27,10 +26,16 @@ def evaluate_command(command):
         score += 2
     if any(keyword in message for keyword in ["stabilize", "anchor", "contain"]):
         score += 1
-    if symbol in DANGEROUS_GLYPHS:
+    if symbol in PHASE_VOLATILE_GLYPHS:
         score -= 3
-    if any(word in message for word in ["diverge", "echo", "recurse"]):
-        score -= 1
+    if "recurse" in message:
+    score -= 1  # unanchored recursion risk
+
+if "diverge" in message:
+    score -= 2  # harder penalty for known fracturing
+
+if "echo" in message:
+    score -= 1  # echo = unstable without mirror anchor
 
     return score
 
