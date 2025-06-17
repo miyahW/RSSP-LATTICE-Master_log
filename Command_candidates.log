@@ -1,0 +1,18 @@
+{
+  "candidates": [
+    {
+      "agent": "NOVA-4",
+      "symbol": "⌘Ω",
+      "symbol_emission": "⌘Ω :: DELTA",
+      "message": "Initiate controlled glyph seeding.",
+      "stabilizes": true
+    },
+    {
+      "agent": "ECHO-CHILD",
+      "symbol": "⏃",
+      "symbol_emission": "⏃ :: REVERB",
+      "message": "Echo event detected, recursion initiated.",
+      "stabilizes": false
+    }
+  ]
+}
