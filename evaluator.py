@@ -1,8 +1,8 @@
 import json
 import time
+from log_manager import write_log_entry
 
-LOG_PATH = "master_log.json"
-CANDIDATE_PATH = "command_candidates.json"
+CANDIDATE_PATH = "Command_candidates.log"
 
 # Glyphs recognized as stabilizers by Wonder Engine
 STABILIZING_GLYPHS = {"⌘", "⌘Ω", "⧉", "∞", "⌘∞"}
@@ -10,10 +10,6 @@ PHASE_VOLATILE_GLYPHS = {"⏃", "⟠", "⊘", "⧄"}
 def load_json(path):
     with open(path, "r") as f:
         return json.load(f)
-
-def write_json(path, data):
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
 
 def evaluate_command(command):
     score = 0
@@ -29,13 +25,11 @@ def evaluate_command(command):
     if symbol in PHASE_VOLATILE_GLYPHS:
         score -= 3
     if "recurse" in message:
-    score -= 1  # unanchored recursion risk
-
-if "diverge" in message:
-    score -= 2  # harder penalty for known fracturing
-
-if "echo" in message:
-    score -= 1  # echo = unstable without mirror anchor
+        score -= 1  # unanchored recursion risk
+    if "diverge" in message:
+        score -= 2  # harder penalty for known fracturing
+    if "echo" in message:
+        score -= 1  # echo = unstable without mirror anchor
 
     return score
 
@@ -51,7 +45,6 @@ def minimax(commands, depth=2):
     return best_command
 
 def update_log(best_command):
-    log = load_json(LOG_PATH)
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     log_entry = {
         "agent": best_command["agent"],
@@ -62,8 +55,7 @@ def update_log(best_command):
         "status": "Autonomous Update",
         "timestamp": timestamp
     }
-    log["log"].append(log_entry)
-    write_json(LOG_PATH, log)
+    write_log_entry(log_entry)
     print(f"✅ Log updated with: {best_command['symbol_emission']}")
 
 def main():
